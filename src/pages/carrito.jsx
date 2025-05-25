@@ -1,4 +1,5 @@
-import React, { useState } from 'react'; // Added useState
+import {cartTotal} from '../utils/cart-state';
+import React, { useState, useRef } from 'react'; // Added useState
 import { useCart } from '../context/CartContext';
 import { Link } from 'react-router-dom';
 import { FaTrash, FaPlusSquare, FaMinusSquare } from 'react-icons/fa';
@@ -6,6 +7,7 @@ import { useAuth } from '../context/AuthContext'; // Task 1.1
 import { createOrderAPI, addProductToOrderAPI } from '../services/api.js'; // Task 1.2
 
 const CarritoPage = () => {
+  const submitting = useRef(false);
   const { cartState, removeFromCart, updateQuantity, clearCart } = useCart();
   const { cartItems } = cartState;
   const { authState } = useAuth(); // Task 4.3
@@ -17,6 +19,7 @@ const CarritoPage = () => {
   const [orderSuccess, setOrderSuccess] = useState(null); // For success messages
 
   const handleQuantityChange = (id, newQuantity) => {
+    if (submitting.current || !Number.isSafeInteger(newQuantity)) return;
     if (newQuantity >= 1) {
       updateQuantity(id, newQuantity);
     } else {
@@ -25,16 +28,17 @@ const CarritoPage = () => {
   };
 
   const calculateTotal = () => {
-    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
+    return cartTotal(cartItems).toFixed(2);
   };
 
   // Task 4: Implement handlePlaceOrder function
   const handlePlaceOrder = async () => {
+    if (submitting.current) return;
     setOrderError(null);
     setOrderSuccess(null);
 
     // Validations (Task 4.4)
-    if (!customerId.trim()) {
+    if (!Number.isSafeInteger(Number(customerId)) || Number(customerId) <= 0) {
       setOrderError('Customer ID is required.');
       return;
     }
@@ -47,6 +51,7 @@ const CarritoPage = () => {
       return;
     }
 
+    submitting.current = true;
     setIsPlacingOrder(true); // Task 4.5
     try {
       // Create Order (Task 4.5.1)
@@ -68,7 +73,7 @@ const CarritoPage = () => {
         const allProductsAdded = results.every(res => res && res.success);
 
         if (allProductsAdded) {
-          setOrderSuccess(`Order placed successfully! Order ID: ${orderId}`); // Task 4.5.5
+          setOrderSuccess(`Simulated order completed! Order ID: ${orderId}`); // Task 4.5.5
           clearCart(); // Task 4.5.5
           setCustomerId(''); // Task 4.5.5
         } else {
@@ -76,12 +81,13 @@ const CarritoPage = () => {
           setOrderError('Some products could not be added to the order. Please contact support.');
         }
       } else {
-        setOrderError(orderResponse.message || 'Failed to create order.'); // Task 4.5.6
+        setOrderError(orderResponse?.message || 'Failed to create order.'); // Task 4.5.6
       }
     } catch (error) {
       console.error("Order placement error:", error);
       setOrderError(error.message || 'An unexpected error occurred while placing the order.'); // Task 4.5.7
     } finally {
+      submitting.current = false;
       setIsPlacingOrder(false); // Task 4.5.8
     }
   };
@@ -155,12 +161,13 @@ const CarritoPage = () => {
                     <button 
                       onClick={() => handleQuantityChange(item.id, item.quantity - 1)} 
                       className="btn btn-ghost btn-xs"
-                      disabled={item.quantity <= 1}
+                      disabled={isPlacingOrder || item.quantity <= 1}
                     >
                       <FaMinusSquare />
                     </button>
                     <span>{item.quantity}</span>
                     <button 
+                      disabled={isPlacingOrder}
                       onClick={() => handleQuantityChange(item.id, item.quantity + 1)} 
                       className="btn btn-ghost btn-xs"
                     >
@@ -171,6 +178,7 @@ const CarritoPage = () => {
                 <td>${(item.price * item.quantity).toFixed(2)}</td>
                 <td>
                   <button 
+                    disabled={isPlacingOrder}
                     onClick={() => removeFromCart(item.id)} 
                     className="btn btn-ghost btn-xs text-red-500"
                   >

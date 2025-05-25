@@ -19,6 +19,10 @@ Desde la raíz, instala las dependencias con `npm install` y usa `npm run dev` p
 
 ## Estado de integración
 
-Las funciones `createOrderAPI` y `addProductToOrderAPI` de `src/services/api.js` simulan respuestas; la creación de pedidos no representa una integración completa. Ese archivo importa Axios, pero el `package.json` actual no lo declara como dependencia directa. Esos puntos requieren trabajo antes de presentar una demo funcional.
+Las funciones `createOrderAPI` y `addProductToOrderAPI` de `src/services/api.js` simulan respuestas; la creación de pedidos no representa una integración completa. Axios se declara como dependencia directa. Las respuestas simuladas incluyen `simulated: true`. Esos puntos requieren trabajo antes de presentar una demo funcional.
 
 Repositorio relacionado: [backend-rojas-market](https://github.com/ErikJhonatan/backend-rojas-market), mantenido como fork. Esta revisión documentó el código sin ejecutar la aplicación ni pruebas.
+
+## Cambios de comportamiento
+
+El carrito rechaza cantidades inválidas o superiores al stock disponible cuando el producto lo declara. Sus datos guardados se cargan al inicializar el estado. El checkout continúa siendo simulado, devuelve `simulated: true` y lo indica en su mensaje de resultado.

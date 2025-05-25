@@ -3,29 +3,23 @@ import axios from 'axios'; // Or your configured axios instance if you have one
 
 const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-  const [authState, setAuthState] = useState({
-    token: localStorage.getItem('token'),
-    user: JSON.parse(localStorage.getItem('user')),
-    isAuthenticated: !!localStorage.getItem('token'),
-  });
-
-  useEffect(() => {
-    // Optional: Could add token validation here if needed
+function storedAuth() {
+  try {
     const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user');
-    if (token && user) {
-      setAuthState({
-        token: token,
-        user: JSON.parse(user),
-        isAuthenticated: true,
-      });
-      // Set axios default header
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    }
-  }, []);
+    const user = JSON.parse(localStorage.getItem('user'));
+    return token && user && typeof user === 'object' && !Array.isArray(user)
+      ? {token, user, isAuthenticated: true} : {token: null, user: null, isAuthenticated: false};
+  } catch { return {token: null, user: null, isAuthenticated: false}; }
+}
+export const AuthProvider = ({ children }) => {
+  const [authState, setAuthState] = useState(storedAuth);
+  useEffect(() => {
+    if (authState.token) axios.defaults.headers.common.Authorization = `Bearer ${authState.token}`;
+    else delete axios.defaults.headers.common.Authorization;
+  }, [authState.token]);
 
   const login = (userData) => { // userData should include token and user object
+    if (!userData?.token || !userData.user) throw new Error('Invalid login response');
     localStorage.setItem('token', userData.token);
     localStorage.setItem('user', JSON.stringify(userData.user));
     axios.defaults.headers.common['Authorization'] = `Bearer ${userData.token}`;
