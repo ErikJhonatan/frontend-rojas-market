@@ -13,9 +13,22 @@ test('rejects fractional quantities and stock overflow', () => {
   }
 });
 test('calculates decimal prices in cents', () => {
-  assert.equal(cartTotal([{price: 0.1, quantity: 3}, {price: 0.2, quantity: 1}]), 0.5);
+  assert.equal(cartTotal([{id: 1, price: 0.1, quantity: 3}, {id: 2, price: 0.2, quantity: 1}]), 0.5);
 });
 test('does not crash on malformed cart storage', () => {
   assert.deepEqual(loadCart({getItem: () => '{broken'}), {cartItems: []});
   assert.deepEqual(loadCart({getItem: () => '{}'}), {cartItems: []});
+});
+
+test('rejects empty prices and invalid identifiers', () => {
+  const state = {cartItems: []};
+  for (const price of [null, '', '  ', true, Infinity]) {
+    assert.equal(cartReducer(state, {type: 'ADD_TO_CART', payload: {id: 1, price}}), state);
+  }
+  assert.equal(cartReducer(state, {type: 'ADD_TO_CART', payload: {id: '', price: 2}}), state);
+});
+test('keeps one stored entry per product and rejects unsafe totals', () => {
+  const item = {id: 1, price: 2, quantity: 1};
+  assert.deepEqual(loadCart({getItem: () => JSON.stringify([item, item])}), {cartItems: [item]});
+  assert.throws(() => cartTotal([{id: 1, price: Number.MAX_SAFE_INTEGER, quantity: 2}]));
 });

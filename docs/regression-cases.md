@@ -14,3 +14,9 @@ Prepared for this change. **Not executed.** Tests, manual checks, lint and build
 Automated cases are prepared in `tests/regression.test.mjs`. After authorization, run `node --test tests/regression.test.mjs`. They have not been executed.
 
 Additional prepared cases: login does not log credentials or tokens; development `/api/v1/auth/login` is forwarded to `API_PROXY_TARGET`; existing API failure assertions require promise rejection with the server or network message. Not executed.
+
+## Additional cases (not executed)
+
+| Case | Input or setup | Expected outcome |
+| --- | --- | --- |
+| Invalid persisted cart | Duplicate product IDs, null/blank prices, unsafe cent total | Duplicate entries discarded; invalid prices and overflow rejected |
