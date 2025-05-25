@@ -80,7 +80,7 @@ const Navbar = () => {
               <span className="text-lg font-bold">8 Artículos</span>
               <span className="text-info">Subtotal: $999</span>
               <div className="card-actions">
-                <button className="btn btn-primary btn-block">Ver carrito</button>
+                <Link to="/carrito" className="btn btn-primary btn-block">Ver carrito</Link>
               </div>
             </div>
           </div>
@@ -100,16 +100,16 @@ const Navbar = () => {
           </div>
           <ul
             tabIndex={0}
-            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
+            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
           >
             <li>
-              <a className="justify-between">
+              <Link to="/perfil" className="justify-between">
                 Perfil
                 <span className="badge">Nuevo</span>
-              </a>
+              </Link>
             </li>
             <li>
-              <a>Configuración</a>
+              <Link to="/configuracion">Configuración</Link>
             </li>
             <li>
               <a>Cerrar sesión</a>
