@@ -12,3 +12,5 @@ Prepared for this change. **Not executed.** Tests, manual checks, lint and build
 | Auth storage | user storage contains malformed JSON; login API returns message object on failure | No render crash; failure is an Error; no fake authentication |
 
 Automated cases are prepared in `tests/regression.test.mjs`. After authorization, run `node --test tests/regression.test.mjs`. They have not been executed.
+
+Additional prepared cases: login does not log credentials or tokens; development `/api/v1/auth/login` is forwarded to `API_PROXY_TARGET`; existing API failure assertions require promise rejection with the server or network message. Not executed.

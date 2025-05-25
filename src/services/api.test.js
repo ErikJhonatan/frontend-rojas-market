@@ -79,11 +79,7 @@ describe('API Service', () => {
       // Simulate an error response structure from the backend
       axios.post.mockRejectedValue({ response: { data: errorResponse } }); 
 
-      try {
-        await loginUser(mockCredentials);
-      } catch (error) {
-        expect(error).toEqual(errorResponse); // Expect the specific error object thrown by api.js
-      }
+      await expect(loginUser(mockCredentials)).rejects.toThrow(errorResponse.message);
 
       expect(axios.post).toHaveBeenCalledTimes(1);
       expect(axios.post).toHaveBeenCalledWith('/api/v1/auth/login', mockCredentials);
@@ -93,12 +89,7 @@ describe('API Service', () => {
       const errorMessage = 'Network Error';
       axios.post.mockRejectedValue(new Error(errorMessage));
 
-      try {
-        await loginUser(mockCredentials);
-      } catch (error) {
-        // As per api.js, it throws new Error('Login failed') if error.response is not available
-        expect(error.message).toBe('Login failed'); 
-      }
+      await expect(loginUser(mockCredentials)).rejects.toThrow(errorMessage);
 
       expect(axios.post).toHaveBeenCalledTimes(1);
       expect(axios.post).toHaveBeenCalledWith('/api/v1/auth/login', mockCredentials);

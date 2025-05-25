@@ -13,10 +13,8 @@ const LoginPage = () => {
   const onSubmit = async (data) => {
     setLoginError(null);
     try {
-      console.log('Login attempt with:', data);
       // Assume loginUser returns an object like { token, user }
       const apiResponse = await loginUser(data); 
-      console.log('Login successful, API Response:', apiResponse);
       
       // Call AuthContext's login function
       login({ token: apiResponse.token, user: apiResponse.user }); 
@@ -24,7 +22,6 @@ const LoginPage = () => {
       // Redirect to dashboard or products page
       navigate('/productos'); 
     } catch (error) {
-      console.error('Login failed:', error);
       // error could be an object like { message: "..." } or just a string
       const errorMessage = error.message || (typeof error === 'string' ? error : 'An unexpected error occurred. Please try again.');
       setLoginError(errorMessage);

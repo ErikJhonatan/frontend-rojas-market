@@ -26,3 +26,5 @@ Repositorio relacionado: [backend-rojas-market](https://github.com/ErikJhonatan/
 ## Cambios de comportamiento
 
 El carrito rechaza cantidades inválidas o superiores al stock disponible cuando el producto lo declara. Sus datos guardados se cargan al inicializar el estado. El checkout continúa siendo simulado, devuelve `simulated: true` y lo indica en su mensaje de resultado.
+
+Para desarrollo, copia `.env.example` a `.env` y ajusta `API_PROXY_TARGET` al backend. Vite reenvía `/api` conservando sus rutas. En producción configura ese prefijo en el servidor de alojamiento; el proxy de Vite solo funciona en desarrollo.
